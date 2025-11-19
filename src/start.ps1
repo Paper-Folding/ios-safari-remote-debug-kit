@@ -71,9 +71,16 @@ $jobBlock = {
             $pythonInstalled = $true
         }
     }
+    # If user is using pyenv-win, "python3.bat" will be used instead
+    if (!$pythonInstalled) {
+        $pythonCmd = "python3.bat"
+        if (Get-Command $pythonCmd -ErrorAction SilentlyContinue) {
+            $pythonInstalled = $true
+        }
+    }
     if ($pythonInstalled) {
         echo "Found Python 3, using it to serve the WebInspector"
-        python3.exe -m http.server $PORT --bind $SRV_HOST --directory $DIR 2>&1 | Out-Null
+        & $pythonCmd -m http.server $PORT --bind $SRV_HOST --directory $DIR 2>&1 | Out-Null
     } elseif (Get-Command "php.exe" -ErrorAction SilentlyContinue) {
         echo "Found PHP, using it to serve the WebInspector"
         $HOST_PORT = "$SRV_HOST`:$PORT";
